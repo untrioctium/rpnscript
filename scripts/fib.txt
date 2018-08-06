@@ -1,0 +1,21 @@
+function fib x begin
+	if x 2 less then
+		x return
+	endif
+	
+	x 1 sub fib x 2 sub fib add return
+endfunction
+
+function main begin
+	i 0 set
+
+	randfib 16 5 rand add set
+
+	"Fibonacci(" randfib ") = " randfib fib "\n" 5 vprint
+
+	while i 15 lesseq do
+		"Fibonacci(" i ") = " i fib "\n" 5 vprint
+		i i 1 add set
+	loop
+	
+endfunction

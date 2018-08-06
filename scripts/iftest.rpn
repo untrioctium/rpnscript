@@ -1,0 +1,9 @@
+function main begin
+	if 2 4 > then
+		"Never gets here" print
+	elseif 2 2 eq then
+		"Here we are!" print
+	else
+		"Nope" print
+	endif
+endfunction

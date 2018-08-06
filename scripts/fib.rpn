@@ -1,0 +1,11 @@
+function fib x begin
+	if x 2 less then
+		x return
+	endif
+	
+	x 1 sub fib x 2 sub fib add return
+endfunction
+
+function main begin
+	"Fibonacci(15) = " 15 fib "\n" 3 vprint
+endfunction

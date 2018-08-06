@@ -1,0 +1,259 @@
+globals grid life_board life_buffer can_randomize endglobals
+
+function neighbor_count board x y begin
+	
+	h board size set
+	w board 0 index size set
+	
+	count 0 set
+	
+	dy -1 set
+	while dy 1 lesseq do
+		
+		dx -1 set
+		while dx 1 lesseq do
+			
+			nx x dx add set
+			ny y dy add set
+				
+			if (((nx 0 greateq) (nx w less) and)
+			    ((ny 0 greateq) (ny h less) and) and) then
+
+				if board ny index nx index 0 neq then
+					count count 1 add set
+				endif
+			endif
+			
+			dx dx 1 add set
+		loop
+		
+		dy dy 1 add set //just a test
+	loop
+	
+	if board y index x index then
+		count count 1 sub set
+	endif
+	
+	count return
+endfunction
+
+function get_cell_color age begin
+	
+	age age 2 mul set
+	
+	if age 255 lesseq then
+		255 age 0
+	elseif age 510 lesseq then
+		510 age sub 255 0
+	elseif age 765 lesseq then
+		0 1020 age sub age 510 sub
+	elseif age 1020 lesseq then
+		age 765 sub 0 255
+	else
+		255 0 255
+	endif
+	
+	3 vreturn
+endfunction
+
+function draw_board board begin
+
+	h board size set
+	w board 0 index size set
+
+	y 0 set
+
+	while y h less do
+		
+		x 0 set
+		while x w less do
+			age board y index x index set
+			if age 0 neq then
+				x y age get_cell_color grid .setColor
+			endif
+			
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop
+	
+endfunction
+
+function gameRandom gen_chance begin
+
+	h life_board size set
+	w life_board 0 index size set
+
+	y 0 set
+
+	while y h less do
+		
+		x 0 set
+		while x w less do
+			if 1.0 randf gen_chance lesseq then
+				life_board y index x index 1 set
+			else
+				life_board y index x index 0 set
+			endif
+			
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop
+	
+	life_board draw_board
+	
+endfunction
+
+function gameClicked x y selected_id begin
+	life_board y index x index selected_id set
+	life_board draw_board
+endfunction
+
+function gameStep begin
+
+	count 0 set
+	cur_age 0 set
+	
+	h life_board size set
+	w life_board 0 index size set
+	
+		
+	y 0 set
+	while y h less do
+		x 0 set
+		
+		while x w less do
+			
+			count life_board x y neighbor_count set
+			cur_age life_board y index x index set
+			
+			if cur_age 0 neq then		
+				if (2 count eq) (3 count eq) or then
+					life_buffer y index x index cur_age 1 add set
+				else
+					life_buffer y index x index 0 set
+				endif
+			else
+				if 3 count eq then
+					life_buffer y index x index 1 set
+				else
+					life_buffer y index x index 0 set
+				endif
+			endif
+			
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop
+		
+	life_buffer draw_board
+	
+	life_board life_buffer swap
+
+endfunction
+
+function gameLoad grid_manager values begin
+
+	grid grid_manager set
+
+	w grid .getWidth set
+	h grid .getHeight set
+	
+	life_board array set
+	life_buffer array set
+	
+	y 0 set
+	while y h less do
+		life_board array pushback
+		life_buffer array pushback
+		
+		x 0 set
+		while x w less do
+			cell_id values pop set
+			
+			life_board y index cell_id pushback
+			life_buffer y index cell_id pushback
+			
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop	
+endfunction
+
+function gameSave begin
+
+	values array set
+	
+	h life_board size set
+	w life_board 0 index size set
+
+	y 0 set
+	while y h less do		
+		x 0 set
+		while x w less do
+			values life_board y index x index pushback
+			
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop
+
+	values return
+	
+endfunction
+
+function gameCellTypes begin
+
+	"Live" 1
+	"Dead" 0
+	
+	stacksize vreturn
+endfunction
+
+function gameInit grid_manager begin
+
+	can_randomize true set
+
+	grid grid_manager set
+
+	w grid .getWidth set
+	h grid .getHeight set
+
+	life_board array set
+	life_buffer array set
+	
+	y 0 set
+	while y h less do
+		life_board array pushback
+		life_buffer array pushback
+		
+		x 0 set
+		while x w less do
+			life_board y index 0 pushback
+			life_buffer y index 0 pushback
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop
+	
+	life_board 0 index 1 index 1 set
+	life_board 1 index 2 index 1 set
+	life_board 2 index 0 index 1 set
+	life_board 2 index 1 index 1 set
+	life_board 2 index 2 index 1 set
+	
+	life_board 0 index w 1 sub index 1 set
+	life_board 0 index w 2 sub index 1 set
+	life_board 1 index w 1 sub index 1 set
+	life_board 1 index w 2 sub index 1 set
+	
+	life_board draw_board
+	
+endfunction

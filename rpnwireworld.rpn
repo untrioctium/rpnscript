@@ -1,0 +1,152 @@
+globals grid wire_board wire_buffer can_randomize endglobals
+
+function ehead_count board x y begin
+	
+	h board size set
+	w board 0 index size set
+	
+	count 0 set
+	
+	dy -1 set
+	while dy 1 lesseq do
+		
+		dx -1 set
+		while dx 1 lesseq do
+			
+			nx x dx add set
+			ny y dy add set
+				
+			if (((nx 0 greateq) (nx w less) and)
+			    ((ny 0 greateq) (ny h less) and) and) then
+
+				if board ny index nx index 2 eq then
+					count count 1 add set
+				endif
+			endif
+			
+			dx dx 1 add set
+		loop
+		
+		dy dy 1 add set
+	loop
+	
+	count return
+endfunction
+
+function draw_board board begin
+
+	h board size set
+	w board 0 index size set
+
+	y 0 set
+
+	while y h less do
+		
+		x 0 set
+		while x w less do
+			id board y index x index set
+			
+			if id 1 eq then
+				x y 255 185 15 grid .setColor
+			elseif id 2 eq then
+				x y 0 0 255 grid .setColor
+			elseif id 3 eq then
+				x y 255 0 0 grid .setColor
+			endif
+			
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop
+	
+endfunction
+
+function gameClicked x y selected_id begin
+	wire_board y index x index selected_id set
+	wire_board draw_board
+endfunction
+
+function gameStep begin
+
+	count 0 set
+	cur_id 0 set
+	
+	h wire_board size set
+	w wire_board 0 index size set
+	
+		
+	y 0 set
+	while y h less do
+		x 0 set
+		
+		while x w less do
+			
+			cur_id wire_board y index x index set
+			
+			if cur_id 1 eq then
+				count wire_board x y ehead_count set
+				
+				if count 1 eq count 2 eq or then
+					wire_buffer y index x index 2 set
+				else
+					wire_buffer y index x index 1 set
+				endif
+			elseif cur_id 2 eq then
+				wire_buffer y index x index 3 set
+			elseif cur_id 3 eq then
+				wire_buffer y index x index 1 set
+			endif
+			
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop
+		
+	wire_buffer draw_board
+	
+	wire_board wire_buffer swap
+
+endfunction
+
+function gameCellTypes begin
+
+	"Blank" 0
+	"Wire" 1
+	"Electron Head" 2
+	"Electron Tail" 3
+	
+	stacksize vreturn
+endfunction
+
+function gameInit grid_manager begin
+
+	can_randomize false set
+
+	grid grid_manager set
+
+	w grid .getWidth set
+	h grid .getHeight set
+
+	wire_board array set
+	wire_buffer array set
+	
+	y 0 set
+	while y h less do
+		wire_board array pushback
+		wire_buffer array pushback
+		
+		x 0 set
+		while x w less do
+			wire_board y index 0 pushback
+			wire_buffer y index 0 pushback
+			x x 1 add set
+		loop
+		
+		y y 1 add set
+	loop
+	
+	wire_board draw_board
+	
+endfunction

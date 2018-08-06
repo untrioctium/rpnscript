@@ -1,0 +1,13 @@
+function main begin
+
+	x 1 set
+
+	while x 5 lesseq do
+		y 1 set
+		while y 5 lesseq do
+			x " * " y " = " x y mul "\n" 6 vprint
+			y y 1 add set
+		loop
+		x x 1 add set
+	loop
+endfunction

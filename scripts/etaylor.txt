@@ -1,0 +1,15 @@
+function main begin
+
+	approx 1.0 set
+	factorial 1.0 set
+
+	cur_term 1 set
+
+	while cur_term 21 neq do
+		factorial factorial cur_term mul set
+		approx approx factorial inv add set
+		cur_term cur_term 1 add set
+	loop
+
+	"e = " approx "\n" 3 vprint
+endfunction
